@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Game 20 hình - 90s Local</title>
+  <style>
+    body{margin:0;font-family:Arial, sans-serif;background:#0f1724;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;min-height:100vh;padding:20px}
+    header{width:100%;display:flex;justify-content:center;gap:10px;margin-bottom:20px}
+    header button{padding:12px 20px;font-size:16px;border:none;border-radius:8px;cursor:pointer;background:#1e293b;color:#fff;transition:0.2s}
+    header button:hover{background:#334155}
+    header button.active{background:#06b6d4;color:#000;font-weight:bold}
+    #viewer{display:flex;flex-direction:column;align-items:center;gap:10px}
+    #viewer img{max-width:90%;max-height:70vh;border-radius:8px;box-shadow:0 4px 15px rgba(0,0,0,0.4)}
+    #timer{font-size:28px;font-weight:bold;margin:10px 0}
+    .controls button{padding:10px 18px;font-size:16px;border:none;border-radius:8px;cursor:pointer;margin:0 5px}
+    #startBtn{background:#06b6d4;color:#000}
+    #nextBtn{background:#7c3aed;color:#fff}
+  </style>
+</head>
+<body>
+  <header>
+    <button class="pkgBtn" data-pkg="1">Gói siêu anh hùng</button>
+    <button class="pkgBtn" data-pkg="2">Gói các loài quả</button>
+    <button class="pkgBtn" data-pkg="3">Gói các món ăn</button>
+    <button class="pkgBtn" data-pkg="4">Gói nhân vật hoạt hình</button>
+  </header>
+
+  <div id="viewer">
+    <div id="timer">90</div>
+    <img id="mainImg" src="" alt="" style="display:none"/>
+    <div class="controls">
+      <button id="startBtn">Bắt đầu</button>
+      <button id="nextBtn">Chuyển tiếp</button>
+    </div>
+  </div>
+
+  <script>
+    const imagePackages = {
+      1: Array.from({length:20}, (_,i)=>`images/g1_img${i+1}.jpg`),
+      2: Array.from({length:20}, (_,i)=>`images/g2_img${i+1}.jpg`),
+      3: Array.from({length:20}, (_,i)=>`images/g3_img${i+1}.jpg`),
+      4: Array.from({length:20}, (_,i)=>`images/g4_img${i+1}.jpg`)
+    };
+
+    let images = [];
+    let current = 0;
+    let timer = null;
+    let timeLeft = 90;
+    let selectedPkg = null;
+
+    const startBtn = document.getElementById('startBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const mainImg = document.getElementById('mainImg');
+    const timerEl = document.getElementById('timer');
+    const pkgButtons = document.querySelectorAll('.pkgBtn');
+
+    pkgButtons.forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        pkgButtons.forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedPkg = btn.dataset.pkg;
+      });
+    });
+
+    function showImage(i){
+      if(i<0) i=0;
+      if(i>=images.length) i=images.length-1;
+      current=i;
+      mainImg.src=images[current];
+      mainImg.style.display='block';
+    }
+
+    function startGame(){
+      if(!selectedPkg){
+        alert('Vui lòng chọn gói trước!');
+        return;
+      }
+      images = imagePackages[selectedPkg];
+      timeLeft = 90;
+      timerEl.textContent = timeLeft;
+      showImage(0);
+      if(timer) clearInterval(timer);
+      timer = setInterval(()=>{
+        timeLeft--;
+        timerEl.textContent = timeLeft;
+        if(timeLeft<=0){
+          clearInterval(timer);
+          alert('Hết giờ!');
+        }
+      },1000);
+    }
+
+    function nextImage(){
+      if(current < images.length-1){
+        showImage(current+1);
+      }
+    }
+
+    startBtn.addEventListener('click', startGame);
+    nextBtn.addEventListener('click', nextImage);
+
+    document.addEventListener('keydown', (e)=>{
+      if(e.code === 'ArrowRight' || e.code === 'Space' || e.code === 'Enter'){
+        nextImage();
+      }
+      if(e.code === 'ArrowLeft'){
+        if(current>0) showImage(current-1);
+      }
+    });
+  </script>
+</body>
+</html>
